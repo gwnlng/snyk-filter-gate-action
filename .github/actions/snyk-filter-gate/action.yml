@@ -19,16 +19,13 @@ runs:
       run: sudo apt-get update && sudo apt-get install -y jq
       shell: bash
 
-    - name: Install snyk-protect (from snyk/cli subdirectory)
+    - name: Install snyk-filter from GitHub
       run: |
-        git clone --depth 1 --branch main https://github.com/snyk/cli.git /tmp/snyk-cli
-        cd /tmp/snyk-cli/packages/snyk-protect
+        git clone --depth 1 https://github.com/snyk-labs/snyk-filter.git /tmp/snyk-filter
+        cd /tmp/snyk-filter
+        node -e "const p=require('./package.json'); delete p.scripts.prepare; require('fs').writeFileSync('package.json', JSON.stringify(p,null,2))"
         npm install --ignore-scripts
         npm install -g . --ignore-scripts
-      shell: bash
-
-    - name: Install snyk-filter
-      run: npm install -g "github:snyk-labs/snyk-filter"
       shell: bash
 
     - name: Run snyk-filter
