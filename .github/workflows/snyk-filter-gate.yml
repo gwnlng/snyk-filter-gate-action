@@ -1,0 +1,26 @@
+# Example workflow: run Snyk test, then gate with snyk-filter by fixable and exploit
+name: Snyk Filter Gate
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+jobs:
+  snyk-and-filter:
+    runs-on: ubuntu-latest
+    steps:
+      # - uses: actions/checkout@v4
+
+      # - name: Install Snyk CLI
+      #   uses: snyk/actions/setup@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # - name: Run Snyk test (JSON)
+      #   run: snyk test --json > snyk-results.json || true
+
+      - name: Snyk Filter Gate
+        uses: ./.github/actions/snyk-filter-gate
+        with:
+          snyk-json-path: snyk-results.json
+          output-json: 'false'

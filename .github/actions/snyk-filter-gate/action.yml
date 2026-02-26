@@ -1,0 +1,38 @@
+name: 'Snyk Filter Gate'
+description: 'Run snyk-filter on Snyk JSON using the default filter (fixable + exploit)'
+inputs:
+  snyk-json-path:
+    description: 'Path to Snyk test JSON file (leave empty to read from stdin)'
+    required: true
+    default: 'snyk.json'
+  output-json:
+    description: 'Set to true to output filtered result as JSON'
+    required: false
+    default: 'false'
+outputs:
+  exit-code:
+    description: 'Exit code from snyk-filter (0 pass, 1 fail)'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+      shell: bash
+
+    - name: Install snyk-filter from GitHub
+      run: npm install -g 'github:snyk-labs/snyk-filter'
+      shell: bash
+
+    - name: Run snyk-filter
+      id: filter
+      shell: bash
+      run: |
+        chmod +x "$GITHUB_ACTION_PATH/call-filter.sh"
+        "$GITHUB_ACTION_PATH/call-filter.sh" \
+          "${{ inputs.snyk-json-path }}" \
+          "${{ inputs.output-json }}"
+        EXIT=$?
+        echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
+        exit $EXIT
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
