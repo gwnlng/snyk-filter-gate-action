@@ -19,11 +19,12 @@ runs:
       run: sudo apt-get update && sudo apt-get install -y jq
       shell: bash
 
+    - name: Install snyk-protect (used as dependency for snyk-filter)
+      run: npm install -g "github:snyk/cli#main&directory=packages/snyk-protect"
+      shell: bash
+
     - name: Install snyk-filter
-      run: |
-        git clone https://github.com/snyk-labs/snyk-filter.git /tmp/snyk-filter
-        cd /tmp/snyk-filter
-        npm install -g /tmp/snyk-filter
+      run: npm install -g "github:snyk-labs/snyk-filter"
       shell: bash
 
     - name: Run snyk-filter
