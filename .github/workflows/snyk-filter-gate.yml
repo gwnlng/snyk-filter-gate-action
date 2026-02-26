@@ -6,12 +6,13 @@ on:
       snyk-json-path:
         description: 'Path to Snyk test JSON file (relative to repo root)'
         required: false
+        type: string
         default: 'snyk.json'
       output-json:
         description: 'Output filtered result as JSON'
         required: false
-        default: 'false'
         type: boolean
+        default: 'false'
   push:
     branches: [main, master]
   pull_request:
