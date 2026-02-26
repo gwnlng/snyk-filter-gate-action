@@ -20,7 +20,7 @@ runs:
       shell: bash
 
     - name: Install snyk-filter from GitHub
-      run: npm install -g 'github:snyk-labs/snyk-filter'
+      run: npm install -g 'github:snyk-labs/snyk-filter' --ignore-scripts
       shell: bash
 
     - name: Run snyk-filter
