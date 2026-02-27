@@ -32,8 +32,8 @@ runs:
       id: filter
       shell: bash
       run: |
-        chmod +x "$GITHUB_ACTION_PATH/call-filter.sh"
-        "$GITHUB_ACTION_PATH/call-filter.sh" \
+        chmod +x "$GITHUB_ACTION_PATH/filter.sh"
+        "$GITHUB_ACTION_PATH/filter.sh" \
           "${{ inputs.snyk-json-path }}" \
           "${{ inputs.output-json }}"
         EXIT=$?

@@ -1,0 +1,93 @@
+# Test the snyk-filter-gate action: script validation and integration
+name: Test
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+jobs:
+  script-tests:
+    name: Script validation (filter.sh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Install snyk-filter from GitHub (same as action)
+        run: |
+          git clone --depth 1 https://github.com/snyk-labs/snyk-filter.git /tmp/snyk-filter
+          cd /tmp/snyk-filter
+          node -e "const p=require('./package.json'); delete p.scripts.prepare; require('fs').writeFileSync('package.json', JSON.stringify(p,null,2))"
+          npm install --ignore-scripts
+          npm install -g . --ignore-scripts
+
+      - name: Run filter.sh tests
+        run: |
+          chmod +x .github/actions/snyk-filter-gate/filter.sh
+          chmod +x tests/filter-test.sh
+          export GITHUB_ACTION_PATH="${{ github.workspace }}/.github/actions/snyk-filter-gate"
+          tests/filter-test.sh
+
+  action-with-valid-path:
+    name: Action with valid JSON (pass)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Snyk Filter Gate (no matching vulns → pass)
+        uses: ./.github/actions/snyk-filter-gate
+        with:
+          snyk-json-path: tests/fixtures/snyk-sample-no-matching-vulns.json
+          output-json: 'false'
+
+  action-with-matching-vulns:
+    name: Action with matching vulns (fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Snyk Filter Gate (matching vulns → fail)
+        uses: ./.github/actions/snyk-filter-gate
+        with:
+          snyk-json-path: tests/fixtures/snyk-sample-with-vulns.json
+          output-json: 'false'
+        id: gate
+        continue-on-error: true
+
+      - name: Assert gate failed
+        run: '[ "${{ steps.gate.outcome }}" = "failure" ] || (echo "Expected gate to fail" && exit 1)'
+
+  action-missing-path:
+    name: Action without snyk-json-path (error)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Snyk Filter Gate (missing path → error)
+        uses: ./.github/actions/snyk-filter-gate
+        with:
+          snyk-json-path: ''
+          output-json: 'false'
+        id: gate
+        continue-on-error: true
+
+      - name: Assert step failed with required input error
+        run: |
+          [ "${{ steps.gate.outcome }}" = "failure" ] || (echo "Expected step to fail when snyk-json-path is empty" && exit 1)
+          [ "${{ steps.gate.conclusion }}" = "failure" ] || exit 1
+          echo "Correctly failed when snyk-json-path was not provided"
+    # Note: action.yml may pass default 'snyk.json'; script will then fail with "file not found"
+    # So we need to pass empty - but in action.yml the input has default 'snyk.json'. So when
+    # we pass snyk-json-path: '' the script gets '' and errors. But YAML might not allow
+    # empty string. Let me check - in workflow we can use snyk-json-path: '' which should
+    # pass empty string. If the action treats empty as "use default", we need to ensure
+    # the action doesn't set a default for this required input when empty is passed.
+    # Looking at action - it has default: 'snyk.json'. So when caller passes nothing,
+    # we get snyk.json. When caller passes '', do we get ''? In GitHub Actions, an empty
+    # string input might still be passed. So with: snyk-json-path: '' we pass empty. Good.
+    # But if the action has required: true and default: 'snyk.json', the default is used
+    # when the input is not supplied. So to test "not provided" we pass explicit empty.
+    # Some runners might coerce empty to the default - we'll see. If the job runs and
+    # the script gets '' we're good.

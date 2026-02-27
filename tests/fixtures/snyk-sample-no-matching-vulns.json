@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "vulnerabilities": [
+    {
+      "id": "SNYK-JS-EXAMPLE-001",
+      "title": "Low Severity",
+      "severity": "low",
+      "isUpgradable": false,
+      "isPatchable": false,
+      "exploit": "No Known Exploit",
+      "moduleName": "example",
+      "packageName": "example"
+    }
+  ],
+  "dependencyCount": 5,
+  "summary": "1 vulnerable dependency path"
+}

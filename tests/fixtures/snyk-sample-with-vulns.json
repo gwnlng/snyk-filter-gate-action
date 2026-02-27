@@ -1,0 +1,27 @@
+{
+  "ok": false,
+  "vulnerabilities": [
+    {
+      "id": "SNYK-JS-MINIMIST-559764",
+      "title": "Prototype Pollution",
+      "severity": "medium",
+      "isUpgradable": true,
+      "isPatchable": false,
+      "exploit": "Mature",
+      "moduleName": "minimist",
+      "packageName": "minimist"
+    },
+    {
+      "id": "SNYK-JS-LODASH-590103",
+      "title": "Command Injection",
+      "severity": "high",
+      "isUpgradable": false,
+      "isPatchable": true,
+      "exploit": "No Known Exploit",
+      "moduleName": "lodash",
+      "packageName": "lodash"
+    }
+  ],
+  "dependencyCount": 10,
+  "summary": "2 vulnerable dependency paths"
+}
