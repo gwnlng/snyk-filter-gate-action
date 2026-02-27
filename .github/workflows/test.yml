@@ -28,6 +28,8 @@ jobs:
           chmod +x .github/actions/snyk-filter-gate/filter.sh
           chmod +x tests/filter-test.sh
           export GITHUB_ACTION_PATH="${{ github.workspace }}/.github/actions/snyk-filter-gate"
+          export NODE_JQ_SKIP_INSTALL_BINARY=true
+          export JQ_PATH="$(which jq)"
           tests/filter-test.sh
 
   action-with-valid-path:

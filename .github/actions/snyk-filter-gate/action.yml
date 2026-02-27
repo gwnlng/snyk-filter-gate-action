@@ -33,6 +33,8 @@ runs:
       shell: bash
       run: |
         chmod +x "$GITHUB_ACTION_PATH/filter.sh"
+        export NODE_JQ_SKIP_INSTALL_BINARY=true
+        export JQ_PATH="$(which jq)"
         "$GITHUB_ACTION_PATH/filter.sh" \
           "${{ inputs.snyk-json-path }}" \
           "${{ inputs.output-json }}"
