@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ACTION_DIR="$(cd "$SCRIPT_DIR/../../.github/actions/snyk-filter-gate" && pwd)"
+ACTION_DIR="$(cd "$SCRIPT_DIR/../.github/actions/snyk-filter-gate" && pwd)"
 FILTER_FILE="$ACTION_DIR/.snyk-filter/snyk.yml"
 FIXTURE_PASS="$SCRIPT_DIR/fixtures/snyk-sample-no-matching-vulns.json"
 FIXTURE_FAIL="$SCRIPT_DIR/fixtures/snyk-sample-with-vulns.json"
