@@ -12,7 +12,7 @@ on:
         description: 'Output filtered result as JSON'
         required: false
         type: boolean
-        default: 'false'
+        default: false
 jobs:
   snyk-filter-gate:
     runs-on: ubuntu-latest
