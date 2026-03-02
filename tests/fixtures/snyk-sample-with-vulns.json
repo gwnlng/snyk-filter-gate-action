@@ -20,8 +20,18 @@
       "exploit": "No Known Exploit",
       "moduleName": "lodash",
       "packageName": "lodash"
+    },
+    {
+      "id": "SNYK-JS-FORMDATA-10841150",
+      "title": "Predictable Value Range from Previous Values",
+      "severity": "critical",
+      "isUpgradable": true,
+      "isPatchable": false,
+      "exploit": "Proof of Concept",
+      "moduleName": "form-data",
+      "packageName": "form-data"
     }
   ],
   "dependencyCount": 10,
-  "summary": "2 vulnerable dependency paths"
+  "summary": "3 vulnerable dependency paths"
 }
