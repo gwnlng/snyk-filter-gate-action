@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Snyk Filter Gate
-        uses: ./.github/actions/snyk-filter-gate
+        uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
         with:
           snyk-json-path: ${{ inputs.snyk-json-path || 'snyk.json' }}
           output-json: ${{ inputs.output-json || 'false' }}
