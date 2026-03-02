@@ -82,3 +82,25 @@ jobs:
             exit 1
           fi
           echo "Correctly failed when snyk-json-path was not provided"
+
+  action-with-invalid-path:
+    name: Action with invalid path (error)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Snyk Filter Gate (invalid path → error)
+        uses: ./.github/actions/snyk-filter-gate
+        with:
+          snyk-json-path: tests/fixtures/does-not-exist.json
+          output-json: 'false'
+        id: gate
+        continue-on-error: true
+
+      - name: Assert step failed with file not found
+        run: |
+          if [ "${{ steps.gate.outcome }}" != "failure" ]; then
+            echo "Expected step to fail when snyk-json-path points to non-existent file (outcome was: ${{ steps.gate.outcome }})"
+            exit 1
+          fi
+          echo "Correctly failed when snyk-json-path was invalid (file not found)"

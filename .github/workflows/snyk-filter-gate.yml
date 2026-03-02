@@ -1,13 +1,13 @@
-# Run snyk-filter on an existing Snyk JSON file. Reusable via workflow_call.
+# Run snyk-filter on a Snyk JSON file from a downloaded artifact. Reusable via workflow_call.
+# The caller must upload the Snyk JSON as an artifact; snyk-json-path is the artifact name.
 name: Snyk Filter Gate
 on:
   workflow_call:
     inputs:
       snyk-json-path:
-        description: 'Path to Snyk test JSON file (relative to repo root)'
-        required: false
+        description: 'Name of the uploaded artifact containing the Snyk JSON (e.g. the artifact name used in upload-artifact)'
+        required: true
         type: string
-        default: 'snyk.json'
       output-json:
         description: 'Output filtered result as JSON'
         required: false
@@ -19,8 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download Snyk results artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.snyk-json-path }}
+
       - name: Snyk Filter Gate
         uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
         with:
-          snyk-json-path: ${{ inputs.snyk-json-path || 'snyk.json' }}
-          output-json: ${{ inputs.output-json || 'false' }}
+          snyk-json-path: ${{ format('{0}/{0}.json', inputs.snyk-json-path) }}
+          output-json: ${{ inputs.output-json && 'true' || 'false' }}
