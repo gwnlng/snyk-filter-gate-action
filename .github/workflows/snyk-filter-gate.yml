@@ -27,5 +27,5 @@ jobs:
       - name: Snyk Filter Gate
         uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
         with:
-          snyk-json-path: ${{ format('{0}/{0}.json', inputs.snyk-json-path) }}
+          snyk-json-path: ${{ format('{0}.json', inputs.snyk-json-path) }}
           output-json: ${{ inputs.output-json && 'true' || 'false' }}
