@@ -77,19 +77,8 @@ jobs:
 
       - name: Assert step failed with required input error
         run: |
-          [ "${{ steps.gate.outcome }}" = "failure" ] || (echo "Expected step to fail when snyk-json-path is empty" && exit 1)
-          [ "${{ steps.gate.conclusion }}" = "failure" ] || exit 1
+          if [ "${{ steps.gate.outcome }}" != "failure" ]; then
+            echo "Expected step to fail when snyk-json-path is empty (outcome was: ${{ steps.gate.outcome }})"
+            exit 1
+          fi
           echo "Correctly failed when snyk-json-path was not provided"
-    # Note: action.yml may pass default 'snyk.json'; script will then fail with "file not found"
-    # So we need to pass empty - but in action.yml the input has default 'snyk.json'. So when
-    # we pass snyk-json-path: '' the script gets '' and errors. But YAML might not allow
-    # empty string. Let me check - in workflow we can use snyk-json-path: '' which should
-    # pass empty string. If the action treats empty as "use default", we need to ensure
-    # the action doesn't set a default for this required input when empty is passed.
-    # Looking at action - it has default: 'snyk.json'. So when caller passes nothing,
-    # we get snyk.json. When caller passes '', do we get ''? In GitHub Actions, an empty
-    # string input might still be passed. So with: snyk-json-path: '' we pass empty. Good.
-    # But if the action has required: true and default: 'snyk.json', the default is used
-    # when the input is not supplied. So to test "not provided" we pass explicit empty.
-    # Some runners might coerce empty to the default - we'll see. If the job runs and
-    # the script gets '' we're good.
