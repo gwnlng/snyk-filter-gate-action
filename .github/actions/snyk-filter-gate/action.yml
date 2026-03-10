@@ -9,6 +9,14 @@ inputs:
     description: 'Set to true to output filtered result as JSON'
     required: false
     default: 'false'
+  json-file-output:
+    description: 'Optional path to write snyk-filter stdout (filtered JSON or report). If not set, no file is written.'
+    required: false
+    default: ''
+  error-log-output:
+    description: 'Optional path to write snyk-filter stderr (error/log output). If not set, no file is written.'
+    required: false
+    default: ''
 outputs:
   exit-code:
     description: 'Exit code from snyk-filter (0 pass, 1 fail)'
@@ -37,7 +45,9 @@ runs:
         export JQ_PATH="$(which jq)"
         "$GITHUB_ACTION_PATH/filter.sh" \
           "${{ inputs.snyk-json-path }}" \
-          "${{ inputs.output-json }}"
+          "${{ inputs.output-json }}" \
+          "${{ inputs.json-file-output }}" \
+          "${{ inputs.error-log-output }}"
         EXIT=$?
         echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
         exit $EXIT
