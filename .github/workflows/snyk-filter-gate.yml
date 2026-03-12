@@ -8,8 +8,8 @@ on:
         description: 'Name of the uploaded artifact containing the Snyk JSON (e.g. the artifact name used in upload-artifact)'
         required: true
         type: string
-      output-json:
-        description: 'Output filtered result as JSON'
+      debug:
+        description: 'Set to true to enable debug output (DEBUG=* for snyk-filter)'
         required: false
         type: boolean
         default: false
@@ -28,4 +28,4 @@ jobs:
         uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
         with:
           snyk-json-path: ${{ format('{0}.json', inputs.snyk-json-path) }}
-          output-json: ${{ inputs.output-json && 'true' || 'false' }}
+          debug: ${{ inputs.debug }}

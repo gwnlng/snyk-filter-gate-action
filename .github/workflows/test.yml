@@ -42,7 +42,6 @@ jobs:
         uses: ./.github/actions/snyk-filter-gate
         with:
           snyk-json-path: tests/fixtures/snyk-sample-no-matching-vulns.json
-          output-json: 'false'
 
   action-with-matching-vulns:
     name: Action with matching vulns (fail)
@@ -54,7 +53,6 @@ jobs:
         uses: ./.github/actions/snyk-filter-gate
         with:
           snyk-json-path: tests/fixtures/snyk-sample-with-vulns.json
-          output-json: 'false'
         id: gate
         continue-on-error: true
 
@@ -71,7 +69,6 @@ jobs:
         uses: ./.github/actions/snyk-filter-gate
         with:
           snyk-json-path: ''
-          output-json: 'false'
         id: gate
         continue-on-error: true
 
@@ -93,7 +90,6 @@ jobs:
         uses: ./.github/actions/snyk-filter-gate
         with:
           snyk-json-path: tests/fixtures/does-not-exist.json
-          output-json: 'false'
         id: gate
         continue-on-error: true
 

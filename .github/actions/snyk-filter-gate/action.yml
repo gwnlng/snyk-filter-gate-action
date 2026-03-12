@@ -5,8 +5,8 @@ inputs:
     description: 'Path to Snyk test JSON file (leave empty to read from stdin)'
     required: true
     default: 'snyk.json'
-  output-json:
-    description: 'Set to true to output filtered result as JSON'
+  debug:
+    description: 'Set to true to enable debug output (sets DEBUG=* for snyk-filter)'
     required: false
     default: 'false'
 outputs:
@@ -36,10 +36,10 @@ runs:
         export NODE_JQ_SKIP_INSTALL_BINARY=true
         export JQ_PATH="$(which jq)"
         "$GITHUB_ACTION_PATH/filter.sh" \
-          "${{ inputs.snyk-json-path }}" \
-          "${{ inputs.output-json }}"
+          "${{ inputs.snyk-json-path }}"
         EXIT=$?
         echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
         exit $EXIT
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
+        DEBUG: ${{ case(inputs.debug == 'true', '*', '') }}
