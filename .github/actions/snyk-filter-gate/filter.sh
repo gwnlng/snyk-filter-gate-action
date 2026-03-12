@@ -29,9 +29,13 @@ run_filter() {
   snyk-filter -i "$SNYK_JSON_PATH" -f "$FILTER_FILE" --json
 }
 
-FILTER_EXIT=0
-run_filter | tee "$JSON_OUTPUT" || true
-FILTER_EXIT=${PIPESTATUS[0]}
+# Run filter to temp file so $? is reliable, then tee to console and file
+set +e
+run_filter > "$JSON_OUTPUT.tmp"
+FILTER_EXIT=$?
+set -e
+cat "$JSON_OUTPUT.tmp" | tee "$JSON_OUTPUT"
+rm -f "$JSON_OUTPUT.tmp"
 
 # handle case where a successful snyk-filter --json includes a "No issues found..." line after the last "}"
 # truncate to last "}" line to ensure valid JSON
