@@ -39,7 +39,6 @@ A `Snyk Open Source security check` step is first executed with Snyk CLI command
         uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
         with:
           snyk-json-path: snyk-results.json
-          output-json: true
 ```
 
 ### Reusable workflow
@@ -75,7 +74,6 @@ A `snyk-security-check` Job is first executed with Snyk CLI command or Snyk Gith
     uses: gwnlng/snyk-filter-gate-action/.github/workflows/snyk-filter-gate.yml@main
     with:
       snyk-json-path: snyk-results
-      output-json: true
 ```
 ### Note
 
