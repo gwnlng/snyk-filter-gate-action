@@ -30,7 +30,8 @@ run_filter() {
 }
 
 FILTER_EXIT=0
-run_filter > "$JSON_OUTPUT" || FILTER_EXIT=$?
+run_filter | tee "$JSON_OUTPUT" || true
+FILTER_EXIT=${PIPESTATUS[0]}
 
 # Generate markdown from JSON using jq template
 if [ -f "$JSON_OUTPUT" ] && [ -s "$JSON_OUTPUT" ]; then
