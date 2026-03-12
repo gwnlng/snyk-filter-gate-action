@@ -29,8 +29,22 @@ run_filter() {
   snyk-filter -i "$SNYK_JSON_PATH" -f "$FILTER_FILE" --json
 }
 
-FILTER_EXIT=0
-run_filter > "$JSON_OUTPUT" || FILTER_EXIT=$?
+# Run filter to temp file so $? is reliable, then tee to console and file
+set +e
+run_filter > "$JSON_OUTPUT.tmp"
+FILTER_EXIT=$?
+set -e
+cat "$JSON_OUTPUT.tmp" | tee "$JSON_OUTPUT"
+rm -f "$JSON_OUTPUT.tmp"
+
+# handle case where a successful snyk-filter --json includes a "No issues found..." line after the last "}"
+# truncate to last "}" line to ensure valid JSON
+if [ -f "$JSON_OUTPUT" ] && [ -s "$JSON_OUTPUT" ]; then
+  last_brace=$(awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/,""); if($0=="}")n=NR} END{if(n)print n}' "$JSON_OUTPUT")
+  if [ -n "$last_brace" ]; then
+    head -n "$last_brace" "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
+  fi
+fi
 
 # Generate markdown from JSON using jq template
 if [ -f "$JSON_OUTPUT" ] && [ -s "$JSON_OUTPUT" ]; then

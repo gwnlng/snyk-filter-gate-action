@@ -1,37 +1,523 @@
 {
-  "ok": false,
   "vulnerabilities": [
     {
-      "id": "SNYK-JS-MINIMIST-559764",
-      "title": "Prototype Pollution",
-      "severity": "medium",
-      "isUpgradable": true,
-      "isPatchable": false,
-      "exploit": "Mature",
-      "moduleName": "minimist",
-      "packageName": "minimist"
-    },
-    {
-      "id": "SNYK-JS-LODASH-590103",
-      "title": "Command Injection",
-      "severity": "high",
-      "isUpgradable": false,
-      "isPatchable": true,
-      "exploit": "No Known Exploit",
-      "moduleName": "lodash",
-      "packageName": "lodash"
-    },
-    {
-      "id": "SNYK-JS-FORMDATA-10841150",
-      "title": "Predictable Value Range from Previous Values",
-      "severity": "critical",
-      "isUpgradable": true,
-      "isPatchable": false,
+      "id": "SNYK-JS-REACTSERVERDOMWEBPACK-14400641",
+      "title": "Exposure of Sensitive System Information to an Unauthorized Control Sphere",
+      "CVSSv3": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "credit": [
+        "Andrew MacPherson"
+      ],
+      "semver": {
+        "vulnerable": [
+          ">=19.0.0 <19.0.2",
+          ">=19.1.0 <19.1.3",
+          ">=19.2.0 <19.2.2"
+        ]
+      },
       "exploit": "Proof of Concept",
-      "moduleName": "form-data",
-      "packageName": "form-data"
+      "fixedIn": [
+        "19.0.2",
+        "19.1.3",
+        "19.2.2"
+      ],
+      "patches": [],
+      "insights": {
+        "triageAdvice": null
+      },
+      "language": "js",
+      "severity": "medium",
+      "cvssScore": 6.9,
+      "functions": [],
+      "malicious": false,
+      "isDisputed": false,
+      "moduleName": "react-server-dom-webpack",
+      "references": [
+        {
+          "url": "https://www.facebook.com/security/advisories/cve-2025-55183",
+          "title": "Facebook Security Advisory"
+        },
+        {
+          "url": "https://github.com/facebook/react/commit/894bc73cb493487c48d57f4508e6278db58e673a",
+          "title": "GitHub Commit"
+        },
+        {
+          "url": "https://github.com/facebook/react/pull/35345",
+          "title": "GitHub PR"
+        },
+        {
+          "url": "https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components",
+          "title": "React Blog Post"
+        },
+        {
+          "url": "https://vercel.com/kb/bulletin/security-bulletin-cve-2025-55184-and-cve-2025-55183",
+          "title": "Vercel Advisory"
+        }
+      ],
+      "cvssDetails": [
+        {
+          "assigner": "Red Hat",
+          "severity": "medium",
+          "cvssV3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+          "cvssV3BaseScore": 5.3,
+          "modificationTime": "2025-12-15T15:10:58.728065Z"
+        }
+      ],
+      "cvssSources": [
+        {
+          "type": "primary",
+          "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N",
+          "assigner": "Snyk",
+          "severity": "medium",
+          "baseScore": 6.9,
+          "cvssVersion": "4.0",
+          "modificationTime": "2025-12-12T18:17:25.107938Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+          "assigner": "Snyk",
+          "severity": "medium",
+          "baseScore": 5.3,
+          "cvssVersion": "3.1",
+          "modificationTime": "2025-12-12T18:17:25.107938Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+          "assigner": "Red Hat",
+          "severity": "medium",
+          "baseScore": 5.3,
+          "cvssVersion": "3.1",
+          "modificationTime": "2025-12-15T15:10:58.728065Z"
+        }
+      ],
+      "description": "## Overview\n[react-server-dom-webpack](https://www.npmjs.org/package/react-server-dom-webpack) is a React Server Components bindings for DOM using Webpack. This is intended to be integrated into meta-frameworks. It is not intended to be imported directly.\n\nAffected versions of this package are vulnerable to Exposure of Sensitive System Information to an Unauthorized Control Sphere. An attacker can access the source code of any Server Function by sending a malicious HTTP request to a vulnerable Server Function.\r\n\r\n**Notes:**\r\n\r\nThis is only exploitable if a Server Function exists that explicitly or implicitly exposes a stringified argument:\r\n\r\n```javascript\r\n'use server';\r\n\r\nexport async function serverFunction(name) {\r\n  const conn = db.createConnection('SECRET KEY');\r\n  const user = await conn.createUser(name); // implicitly stringified, leaked in db\r\n\r\n  return {\r\n   id: user.id,\r\n   message: `Hello, ${name}!` // explicitly stringified, leaked in reply\r\n  }}\r\n```\r\n\r\nAn attacker may be able to leak the following:\r\n\r\n```javascript\r\n0:{\"a\":\"$@1\",\"f\":\"\",\"b\":\"Wy43RxUKdxmr5iuBzJ1pN\"}\r\n1:{\"id\":\"tva1sfodwq\",\"message\":\"Hello, async function(a){console.log(\\\"serverFunction\\\");let b=i.createConnection(\\\"SECRET KEY\\\");return{id:(await b.createUser(a)).id,message:`Hello, ${a}!`}}!\"}\r\n```\r\n\r\nSecrets hardcoded in source code may be exposed, but runtime secrets such as `process.env.SECRET` are not affected.\r\n\r\nThe scope of the exposed code is limited to the code inside the Server Function, which may include other functions depending on the amount of inlining your bundler provides.\r\n\r\nEven if your app does not implement any React Server Function endpoints it may still be vulnerable if your app supports React Server Components.\r\n\r\nIf your app’s React code does not use a server, your app is not affected by these vulnerabilities. If your app does not use a framework, bundler, or bundler plugin that supports React Server Components, your app is not affected by these vulnerabilities.\r\n\r\nFor React Native users not using a monorepo or `react-dom`, your `react` version should be pinned in your `package.json`, and there are no additional steps needed.\r\n\r\nIf you are using React Native in a monorepo, you should update only the impacted packages if they are installed: `react-server-dom-webpack`, `react-server-dom-parcel`, `react-server-dom-turbopack`. This is required to mitigate the security advisories, but you do not need to update `react` and `react-dom` so this will not cause the version mismatch error in React Native. See [this issue](https://github.com/facebook/react-native/issues/54772#issuecomment-3617929832) for more information.\n## Remediation\nUpgrade `react-server-dom-webpack` to version 19.0.2, 19.1.3, 19.2.2 or higher.\n## References\n- [Facebook Security Advisory](https://www.facebook.com/security/advisories/cve-2025-55183)\n- [GitHub Commit](https://github.com/facebook/react/commit/894bc73cb493487c48d57f4508e6278db58e673a)\n- [GitHub PR](https://github.com/facebook/react/pull/35345)\n- [React Blog Post](https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components)\n- [Vercel Advisory](https://vercel.com/kb/bulletin/security-bulletin-cve-2025-55184-and-cve-2025-55183)\n",
+      "epssDetails": {
+        "percentile": "0.95744",
+        "probability": "0.22783",
+        "modelVersion": "v2025.03.14"
+      },
+      "identifiers": {
+        "CVE": [
+          "CVE-2025-55183"
+        ],
+        "CWE": [
+          "CWE-497"
+        ],
+        "GHSA": [
+          "GHSA-925w-6v3x-g4j4",
+          "GHSA-c6m7-q6pr-c64r",
+          "GHSA-w37m-7fhw-fmv9"
+        ]
+      },
+      "packageName": "react-server-dom-webpack",
+      "proprietary": false,
+      "creationTime": "2025-12-12T10:53:08.800655Z",
+      "functions_new": [],
+      "alternativeIds": [],
+      "disclosureTime": "2025-12-11T20:43:45Z",
+      "exploitDetails": {
+        "sources": [],
+        "maturityLevels": [
+          {
+            "type": "secondary",
+            "level": "Not Defined",
+            "format": "CVSSv3"
+          },
+          {
+            "type": "primary",
+            "level": "Not Defined",
+            "format": "CVSSv4"
+          }
+        ]
+      },
+      "packageManager": "npm",
+      "publicationTime": "2025-12-12T10:53:09.015743Z",
+      "severityBasedOn": "CVSS",
+      "modificationTime": "2025-12-15T15:10:58.728065Z",
+      "socialTrendAlert": true,
+      "severityWithCritical": "medium",
+      "from": [
+        "nodejs-playground@1.0.0",
+        "react-server-dom-webpack@19.0.0"
+      ],
+      "upgradePath": [
+        false,
+        "react-server-dom-webpack@19.0.4"
+      ],
+      "isUpgradable": true,
+      "isPatchable": false,
+      "name": "react-server-dom-webpack",
+      "version": "19.0.0"
+    },
+    {
+      "id": "SNYK-JS-REACTSERVERDOMWEBPACK-15109011",
+      "title": "Allocation of Resources Without Limits or Throttling",
+      "CVSSv3": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+      "credit": [
+        "Mufeed",
+        "Joachim Viide",
+        "RyotaK",
+        "Xiangwei Zhang"
+      ],
+      "semver": {
+        "vulnerable": [
+          ">=19.0.0-canary-2b036d3f1-20240327 <19.0.4",
+          ">=19.1.0-canary-130095f7-20241212 <19.1.5",
+          ">=19.2.0-canary-63779030-20250328 <19.2.4"
+        ]
+      },
+      "exploit": "Not Defined",
+      "fixedIn": [
+        "19.0.4",
+        "19.1.5",
+        "19.2.4"
+      ],
+      "patches": [],
+      "insights": {
+        "triageAdvice": null
+      },
+      "language": "js",
+      "severity": "high",
+      "cvssScore": 8.7,
+      "functions": [],
+      "malicious": false,
+      "isDisputed": false,
+      "moduleName": "react-server-dom-webpack",
+      "references": [
+        {
+          "url": "https://github.com/facebook/react/commit/10680271fab565e0edf948d3a6dc9d30e83df94c",
+          "title": "GitHub Commit"
+        },
+        {
+          "url": "https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components%23high-severity-multiple-denial-of-service",
+          "title": "React Security Advisory"
+        }
+      ],
+      "cvssDetails": [],
+      "cvssSources": [
+        {
+          "type": "primary",
+          "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+          "assigner": "Snyk",
+          "severity": "high",
+          "baseScore": 8.7,
+          "cvssVersion": "4.0",
+          "modificationTime": "2026-02-06T06:39:22.900698Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+          "assigner": "Snyk",
+          "severity": "high",
+          "baseScore": 7.5,
+          "cvssVersion": "3.1",
+          "modificationTime": "2026-02-06T06:39:22.900698Z"
+        }
+      ],
+      "description": "## Overview\n[react-server-dom-webpack](https://www.npmjs.org/package/react-server-dom-webpack) is a React Server Components bindings for DOM using Webpack. This is intended to be integrated into meta-frameworks. It is not intended to be imported directly.\n\nAffected versions of this package are vulnerable to Allocation of Resources Without Limits or Throttling in the decoding reply functions of React Flight protocol. An attacker can cause server crashes, out-of-memory exceptions, or excessive CPU usage by sending specially crafted HTTP requests to Server Function endpoints.\r\n\r\n**Notes:**\r\n\r\n- This issue is a result of an incomplete fix for [CVE-2025-55184](https://www.cve.org/CVERecord?id=CVE-2025-55184)\r\n- If your app’s React code does not use a server, your app is not affected by these vulnerabilities. \r\n- If your app does not use a framework, bundler, or bundler plugin that supports React Server Components, your app is not affected by these vulnerabilities.\n## Remediation\nUpgrade `react-server-dom-webpack` to version 19.0.4, 19.1.5, 19.2.4 or higher.\n## References\n- [GitHub Commit](https://github.com/facebook/react/commit/10680271fab565e0edf948d3a6dc9d30e83df94c)\n- [React Security Advisory](https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components#high-severity-multiple-denial-of-service)\n",
+      "epssDetails": {
+        "percentile": "0.78701",
+        "probability": "0.01209",
+        "modelVersion": "v2025.03.14"
+      },
+      "identifiers": {
+        "CVE": [
+          "CVE-2026-23864"
+        ],
+        "CWE": [
+          "CWE-770"
+        ],
+        "GHSA": [
+          "GHSA-83fc-fqcc-2hmg"
+        ]
+      },
+      "packageName": "react-server-dom-webpack",
+      "proprietary": false,
+      "creationTime": "2026-01-27T13:47:59.015065Z",
+      "functions_new": [],
+      "alternativeIds": [],
+      "disclosureTime": "2026-01-26T19:49:42Z",
+      "exploitDetails": {
+        "sources": [],
+        "maturityLevels": [
+          {
+            "type": "secondary",
+            "level": "Not Defined",
+            "format": "CVSSv3"
+          },
+          {
+            "type": "primary",
+            "level": "Not Defined",
+            "format": "CVSSv4"
+          }
+        ]
+      },
+      "packageManager": "npm",
+      "publicationTime": "2026-01-27T21:00:43.615224Z",
+      "severityBasedOn": "CVSS",
+      "modificationTime": "2026-02-06T06:39:22.900698Z",
+      "socialTrendAlert": false,
+      "severityWithCritical": "high",
+      "from": [
+        "nodejs-playground@1.0.0",
+        "react-server-dom-webpack@19.0.0"
+      ],
+      "upgradePath": [
+        false,
+        "react-server-dom-webpack@19.0.4"
+      ],
+      "isUpgradable": true,
+      "isPatchable": false,
+      "name": "react-server-dom-webpack",
+      "version": "19.0.0"
     }
   ],
-  "dependencyCount": 10,
-  "summary": "3 vulnerable dependency paths"
+  "ok": false,
+  "dependencyCount": 93,
+  "org": "gwunleong.lee",
+  "policy": "# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.\nversion: v1.25.1\n# ignores vulnerabilities until expiry date; change duration by modifying expiry date\nignore:\n  SNYK-JS-REACTSERVERDOMWEBPACK-14400633:\n    - '*':\n        reason: None Given\n        expires: 2025-12-18T05:37:46.178Z\n        created: 2024-10-15T05:37:46.181Z\n        source: cli\npatch: {}\nexclude:\n  global:\n    - testme\n    - node_modules\n",
+  "isPrivate": true,
+  "licensesPolicy": {
+    "severities": {},
+    "orgLicenseRules": {}
+  },
+  "packageManager": "npm",
+  "projectId": "bb2b2a8f-a09b-4247-9953-b0271f945708",
+  "ignoreSettings": {
+    "adminOnly": false,
+    "reasonRequired": false,
+    "disregardFilesystemIgnores": false
+  },
+  "summary": "16 vulnerable dependency paths",
+  "remediation": {
+    "unresolved": [
+      {
+        "id": "SNYK-JS-LODASH-15053838",
+        "title": "Prototype Pollution",
+        "CVSSv3": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L",
+        "credit": [
+          "lukas-eu"
+        ],
+        "semver": {
+          "vulnerable": [
+            ">=4.0.0 <4.17.23"
+          ]
+        },
+        "exploit": "Not Defined",
+        "fixedIn": [
+          "4.17.23"
+        ],
+        "patches": [],
+        "insights": {
+          "triageAdvice": null
+        },
+        "language": "js",
+        "severity": "medium",
+        "cvssScore": 6.9,
+        "functions": [],
+        "malicious": false,
+        "isDisputed": false,
+        "moduleName": "lodash",
+        "references": [
+          {
+            "url": "https://github.com/lodash/lodash/commit/edadd452146f7e4bad4ea684e955708931d84d81",
+            "title": "GitHub Commit"
+          }
+        ],
+        "cvssDetails": [
+          {
+            "assigner": "SUSE",
+            "severity": "high",
+            "cvssV3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H",
+            "cvssV3BaseScore": 8.2,
+            "modificationTime": "2026-02-12T11:04:11.049925Z"
+          },
+          {
+            "assigner": "NVD",
+            "severity": "medium",
+            "cvssV3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+            "cvssV3BaseScore": 5.3,
+            "modificationTime": "2026-02-18T01:16:59.766406Z"
+          },
+          {
+            "assigner": "Red Hat",
+            "severity": "high",
+            "cvssV3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H",
+            "cvssV3BaseScore": 8.2,
+            "modificationTime": "2026-03-01T05:26:10.605503Z"
+          }
+        ],
+        "cvssSources": [
+          {
+            "type": "primary",
+            "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N",
+            "assigner": "Snyk",
+            "severity": "medium",
+            "baseScore": 6.9,
+            "cvssVersion": "4.0",
+            "modificationTime": "2026-01-22T07:08:27.188933Z"
+          },
+          {
+            "type": "secondary",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L",
+            "assigner": "Snyk",
+            "severity": "medium",
+            "baseScore": 6.5,
+            "cvssVersion": "3.1",
+            "modificationTime": "2026-01-22T07:08:27.188933Z"
+          },
+          {
+            "type": "secondary",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H",
+            "assigner": "SUSE",
+            "severity": "high",
+            "baseScore": 8.2,
+            "cvssVersion": "3.1",
+            "modificationTime": "2026-02-12T11:04:11.049925Z"
+          },
+          {
+            "type": "secondary",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+            "assigner": "NVD",
+            "severity": "medium",
+            "baseScore": 5.3,
+            "cvssVersion": "3.1",
+            "modificationTime": "2026-02-18T01:16:59.766406Z"
+          },
+          {
+            "type": "secondary",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H",
+            "assigner": "Red Hat",
+            "severity": "high",
+            "baseScore": 8.2,
+            "cvssVersion": "3.1",
+            "modificationTime": "2026-03-01T05:26:10.605503Z"
+          }
+        ],
+        "description": "## Overview\n[lodash](https://www.npmjs.com/package/lodash) is a modern JavaScript utility library delivering modularity, performance, & extras.\n\nAffected versions of this package are vulnerable to Prototype Pollution via the `_.unset` and `_.omit` functions. An attacker can delete methods held in properties of global prototypes but cannot overwrite those properties.\n\n## Details\n\nPrototype Pollution is a vulnerability affecting JavaScript. Prototype Pollution refers to the ability to inject properties into existing JavaScript language construct prototypes, such as objects. JavaScript allows all Object attributes to be altered, including their magical attributes such as `__proto__`, `constructor` and `prototype`. An attacker manipulates these attributes to overwrite, or pollute, a JavaScript application object prototype of the base object by injecting other values.  Properties on the `Object.prototype` are then inherited by all the JavaScript objects through the prototype chain. When that happens, this leads to either denial of service by triggering JavaScript exceptions, or it tampers with the application source code to force the code path that the attacker injects, thereby leading to remote code execution.\n\nThere are two main ways in which the pollution of prototypes occurs:\n\n-   Unsafe `Object` recursive merge\n    \n-   Property definition by path\n    \n\n### Unsafe Object recursive merge\n\nThe logic of a vulnerable recursive merge function follows the following high-level model:\n```\nmerge (target, source)\n\n  foreach property of source\n\n    if property exists and is an object on both the target and the source\n\n      merge(target[property], source[property])\n\n    else\n\n      target[property] = source[property]\n```\n<br>  \n\nWhen the source object contains a property named `__proto__` defined with `Object.defineProperty()` , the condition that checks if the property exists and is an object on both the target and the source passes and the merge recurses with the target, being the prototype of `Object` and the source of `Object` as defined by the attacker. Properties are then copied on the `Object` prototype.\n\nClone operations are a special sub-class of unsafe recursive merges, which occur when a recursive merge is conducted on an empty object: `merge({},source)`.\n\n`lodash` and `Hoek` are examples of libraries susceptible to recursive merge attacks.\n\n### Property definition by path\n\nThere are a few JavaScript libraries that use an API to define property values on an object based on a given path. The function that is generally affected contains this signature: `theFunction(object, path, value)`\n\nIf the attacker can control the value of “path”, they can set this value to `__proto__.myValue`. `myValue` is then assigned to the prototype of the class of the object.\n\n## Types of attacks\n\nThere are a few methods by which Prototype Pollution can be manipulated:\n\n| Type |Origin  |Short description |\n|--|--|--|\n| **Denial of service (DoS)**|Client  |This is the most likely attack. <br>DoS occurs when `Object` holds generic functions that are implicitly called for various operations (for example, `toString` and `valueOf`). <br> The attacker pollutes `Object.prototype.someattr` and alters its state to an unexpected value such as `Int` or `Object`. In this case, the code fails and is likely to cause a denial of service.  <br>**For example:** if an attacker pollutes `Object.prototype.toString` by defining it as an integer, if the codebase at any point was reliant on `someobject.toString()` it would fail. |\n |**Remote Code Execution**|Client|Remote code execution is generally only possible in cases where the codebase evaluates a specific attribute of an object, and then executes that evaluation.<br>**For example:** `eval(someobject.someattr)`. In this case, if the attacker pollutes `Object.prototype.someattr` they are likely to be able to leverage this in order to execute code.|\n|**Property Injection**|Client|The attacker pollutes properties that the codebase relies on for their informative value, including security properties such as cookies or tokens.<br>  **For example:** if a codebase checks privileges for `someuser.isAdmin`, then when the attacker pollutes `Object.prototype.isAdmin` and sets it to equal `true`, they can then achieve admin privileges.|\n\n## Affected environments\n\nThe following environments are susceptible to a Prototype Pollution attack:\n\n-   Application server\n    \n-   Web server\n\n-   Web browser\n    \n\n## How to prevent\n\n1.  Freeze the prototype— use `Object.freeze (Object.prototype)`.\n    \n2.  Require schema validation of JSON input.\n    \n3.  Avoid using unsafe recursive merge functions.\n    \n4.  Consider using objects without prototypes (for example, `Object.create(null)`), breaking the prototype chain and preventing pollution.\n    \n5.  As a best practice use `Map` instead of `Object`.\n\n### For more information on this vulnerability type:\n\n[Arteau, Olivier. “JavaScript prototype pollution attack in NodeJS application.” GitHub, 26 May 2018](https://github.com/HoLyVieR/prototype-pollution-nsec18/blob/master/paper/JavaScript_prototype_pollution_attack_in_NodeJS.pdf)\n\n## Remediation\nUpgrade `lodash` to version 4.17.23 or higher.\n## References\n- [GitHub Commit](https://github.com/lodash/lodash/commit/edadd452146f7e4bad4ea684e955708931d84d81)\n",
+        "epssDetails": {
+          "percentile": "0.06732",
+          "probability": "0.00025",
+          "modelVersion": "v2025.03.14"
+        },
+        "identifiers": {
+          "CVE": [
+            "CVE-2025-13465"
+          ],
+          "CWE": [
+            "CWE-1321"
+          ],
+          "GHSA": [
+            "GHSA-xxjr-mmjv-4gpg"
+          ]
+        },
+        "packageName": "lodash",
+        "proprietary": false,
+        "creationTime": "2026-01-22T07:06:24.683701Z",
+        "functions_new": [],
+        "alternativeIds": [],
+        "disclosureTime": "2026-01-21T23:01:22Z",
+        "exploitDetails": {
+          "sources": [],
+          "maturityLevels": [
+            {
+              "type": "secondary",
+              "level": "Not Defined",
+              "format": "CVSSv3"
+            },
+            {
+              "type": "primary",
+              "level": "Not Defined",
+              "format": "CVSSv4"
+            }
+          ]
+        },
+        "packageManager": "npm",
+        "publicationTime": "2026-01-22T07:08:27.179012Z",
+        "severityBasedOn": "CVSS",
+        "modificationTime": "2026-03-01T05:26:10.605503Z",
+        "socialTrendAlert": false,
+        "packagePopularityRank": 99,
+        "from": [
+          "nodejs-playground@1.0.0",
+          "snyk-request-manager@1.9.0",
+          "lodash@4.17.21"
+        ],
+        "upgradePath": [],
+        "isUpgradable": false,
+        "isPatchable": false,
+        "isPinnable": false,
+        "isRuntime": false,
+        "name": "lodash",
+        "version": "4.17.21",
+        "severityWithCritical": "medium"
+      }
+    ],
+    "upgrade": {
+      "axios@1.7.1": {
+        "upgradeTo": "axios@1.13.5",
+        "upgrades": [
+          "axios@1.7.1",
+          "axios@1.7.1",
+          "axios@1.7.1",
+          "axios@1.7.1",
+          "axios@1.7.1"
+        ],
+        "vulns": [
+          "SNYK-JS-AXIOS-15252993",
+          "SNYK-JS-AXIOS-12613773",
+          "SNYK-JS-AXIOS-9403194",
+          "SNYK-JS-AXIOS-9292519",
+          "SNYK-JS-AXIOS-7361793"
+        ]
+      },
+      "form-data@2.5.0": {
+        "upgradeTo": "form-data@2.5.5",
+        "upgrades": [
+          "form-data@2.5.0"
+        ],
+        "vulns": [
+          "SNYK-JS-FORMDATA-10841150"
+        ]
+      },
+      "nodemailer@7.0.10": {
+        "upgradeTo": "nodemailer@7.0.11",
+        "upgrades": [
+          "nodemailer@7.0.10"
+        ],
+        "vulns": [
+          "SNYK-JS-NODEMAILER-14157156"
+        ]
+      },
+      "react-server-dom-webpack@19.0.0": {
+        "upgradeTo": "react-server-dom-webpack@19.0.4",
+        "upgrades": [
+          "react-server-dom-webpack@19.0.0",
+          "react-server-dom-webpack@19.0.0",
+          "react-server-dom-webpack@19.0.0",
+          "react-server-dom-webpack@19.0.0"
+        ],
+        "vulns": [
+          "SNYK-JS-REACTSERVERDOMWEBPACK-14173285",
+          "SNYK-JS-REACTSERVERDOMWEBPACK-14400633",
+          "SNYK-JS-REACTSERVERDOMWEBPACK-14400641",
+          "SNYK-JS-REACTSERVERDOMWEBPACK-15109011"
+        ]
+      }
+    },
+    "patch": {},
+    "ignore": {},
+    "pin": {}
+  },
+  "filesystemPolicy": true,
+  "filtered": {
+    "ignore": [],
+    "patch": []
+  },
+  "uniqueCount": 12,
+  "projectName": "nodejs-playground",
+  "displayTargetFile": "package-lock.json",
+  "hasUnknownVersions": false,
+  "path": "/Users/gwunleong/VSCodeProjects/nodejs-playground"
 }
