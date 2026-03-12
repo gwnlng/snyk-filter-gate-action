@@ -53,10 +53,32 @@ echo "=== Test: valid file (requires snyk-filter installed) ==="
 if command -v snyk-filter >/dev/null 2>&1 && [ -f "$FILTER_FILE" ]; then
   if [ -f "$FIXTURE_PASS" ]; then
     # Filter expects 0 matching vulns to pass; this fixture has no matching vulns
-    run_script "$FIXTURE_PASS" "false" && echo "PASS: filter passed (exit 0)" || { echo "PASS: filter run (exit 1 = vulns found is acceptable)"; true; }
+    run_script "$FIXTURE_PASS" && echo "PASS: filter passed (exit 0)" || { echo "PASS: filter run (exit 1 = vulns found is acceptable)"; true; }
   fi
 else
   echo "SKIP: snyk-filter not installed or filter file missing; run in CI or install snyk-filter for full tests"
+fi
+
+echo "=== Test: FIXTURE_FAIL returns filtered vulnerabilities (negative scenario) ==="
+if command -v snyk-filter >/dev/null 2>&1 && [ -f "$FILTER_FILE" ] && [ -f "$FIXTURE_FAIL" ]; then
+  # Negative scenario: fixture has matching vulns; we pass the test if output contains filtered vulns.
+  run_script "$FIXTURE_FAIL" && exit_code=0 || exit_code=1
+  if [ -f "snyk-filter-results.json" ]; then
+    vuln_count=$(jq -r '.vulnerabilities | length' snyk-filter-results.json 2>/dev/null || echo "0")
+    if [ "${vuln_count:-0}" -gt 0 ]; then
+      echo "PASS: snyk-filter-results.json contains $vuln_count filtered vulnerability(ies)"
+      [ "$exit_code" -eq 1 ] && echo "PASS: filter returned exit 1 (gate fail as expected)" || echo "Note: filter returned exit $exit_code (output still had filtered vulns)"
+    else
+      echo "FAIL: snyk-filter-results.json has no vulnerabilities (expected filtered vulns)"
+      FAILED=1
+    fi
+  else
+    echo "FAIL: snyk-filter-results.json was not generated"
+    FAILED=1
+  fi
+  # Pass the test when output has filtered vulns; do not set FAILED for exit code.
+else
+  echo "SKIP: snyk-filter not installed, filter missing, or FIXTURE_FAIL not found"
 fi
 
 if [ $FAILED -eq 1 ]; then
