@@ -57,7 +57,12 @@ jobs:
         continue-on-error: true
 
       - name: Assert gate failed
-        run: '[ "${{ steps.gate.outcome }}" = "failure" ] || (echo "Expected gate to fail" && exit 1)'
+        run: |
+          if [ "${{ steps.gate.outcome }}" != "failure" ]; then
+            echo "Expected gate to fail when matching vulnerabilities are present (outcome was: ${{ steps.gate.outcome }})"
+            exit 1
+          fi
+          echo "Correctly failed when matching vulnerabilities were found"
 
   action-missing-path:
     name: Action without snyk-json-path (error)
