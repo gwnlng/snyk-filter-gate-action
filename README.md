@@ -1,8 +1,15 @@
 # snyk-filter-gate-action
 
-GitHub Action that runs [snyk-filter](https://docs.snyk.io/developer-tools/snyk-cli/scan-and-maintain-projects-using-the-cli/cli-tools/snyk-filter) on a Snyk test generated JSON with a defined continuous integration continuous deployment (CICD) security gating filter based on the scan result JSON properties.
+GitHub Action that runs [snyk-filter](https://docs.snyk.io/developer-tools/snyk-cli/scan-and-maintain-projects-using-the-cli/cli-tools/snyk-filter) on a Snyk test generated JSON as a security gating filter based on the scan result JSON properties.
 
-## CICD Gating Ruleset
+This GitHub Action determines following result based on the result of the security filtering:
+
+- Pass security filter (exit status 0) when no vulnerabilities are filtered
+- Fails security filter (exist status 1) when vulnerabilities are filtered
+
+The final filter gating results is sent to GitHub Job Summary i.e. `GITHUB_STEP_SUMMARY` [variable](https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables).
+
+## Security Gate
 
 The snyk-filter ruleset is managed in a default [snyk.yml](.github/actions/snyk-filter-gate/.snyk-filter/snyk.yml).
 This gating ruleset is maintained by Application Security teams as a central CICD gating governance and control.
@@ -10,6 +17,20 @@ This gating ruleset is maintained by Application Security teams as a central CIC
 ## Writing CICD Gating rules
 
 See [snyk-filter sample filters](https://github.com/snyk-labs/snyk-filter/tree/master/sample-filters).
+
+## Templating Scan Result
+
+See JQ template [vulnerabilities-table.jq](.github/actions/snyk-filter-gate/vulnerabilities-table.jq).  
+
+This is a JQ template to transform filtered JSON result to a markdown file. See following resources:
+
+- [How to Transform JSON Data with jq](https://www.digitalocean.com/community/tutorials/how-to-transform-json-data-with-jq)
+- [The JQ Playground](https://play.jqlang.org/)
+
+> [!NOTE]
+> GitHub Step [Job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#step-isolation-and-limits) is restricted to a maximum size of 1 MiB. <br>
+> The filtered result markdown file content sent to Job summary needs to fit within this size limit.
+
 
 ## Usage
 
