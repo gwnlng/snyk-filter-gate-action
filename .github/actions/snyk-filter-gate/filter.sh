@@ -37,12 +37,21 @@ set -e
 cat "$JSON_OUTPUT.tmp" | tee "$JSON_OUTPUT"
 rm -f "$JSON_OUTPUT.tmp"
 
-# handle case where a successful snyk-filter --json includes a "No issues found..." line after the last "}"
-# truncate to last "}" line to ensure valid JSON
+# Remove snyk-filter message lines (e.g. "project - No issues found after custom filtering") that break JSON
+# If we have concatenated JSON objects (}\n{), turn them into a JSON array so jq can parse
 if [ -f "$JSON_OUTPUT" ] && [ -s "$JSON_OUTPUT" ]; then
-  last_brace=$(awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/,""); if($0=="}")n=NR} END{if(n)print n}' "$JSON_OUTPUT")
-  if [ -n "$last_brace" ]; then
-    head -n "$last_brace" "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
+  grep -v 'No issues found after custom filtering[[:space:]]*$' "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
+  awk '
+    /^}[[:space:]]*$/ {
+      if (getline n > 0) {
+        if (n ~ /^[[:space:]]*\{/) { printf "},"; print n; next }
+        else { print; print n; next }
+      }
+    }
+    { print }
+  ' "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
+  if grep -q '^},{[[:space:]]*$' "$JSON_OUTPUT" 2>/dev/null; then
+    (echo '['; cat "$JSON_OUTPUT"; echo ']') > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
   fi
 fi
 
