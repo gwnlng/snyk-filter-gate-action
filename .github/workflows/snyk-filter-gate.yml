@@ -25,7 +25,7 @@ jobs:
           name: ${{ inputs.snyk-json-path }}
 
       - name: Snyk Filter Gate
-        uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@main
+        uses: gwnlng/snyk-filter-gate-action/.github/actions/snyk-filter-gate@fix/truncate-to-json
         with:
           snyk-json-path: ${{ format('{0}.json', inputs.snyk-json-path) }}
           debug: ${{ inputs.debug }}
