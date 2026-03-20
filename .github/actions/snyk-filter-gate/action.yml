@@ -22,6 +22,7 @@ runs:
         cache: 'npm'
 
     - name: Install snyk-filter
+      shell: bash
       run: npm i -g snyk-filter@1.3.2
 
     - name: Run snyk-filter gating with transformed JSON results
@@ -51,6 +52,7 @@ runs:
 
     - name: Transform snyk-filter results to markdown
       if: always() && steps.upload-gating-results.outcome == 'success'
+      shell: bash
       run: |
         jq -rf "${{ github.action_path }}/vulnerabilities-table.jq" "$output-json-path" > "${{ env.SUMMARY_MD }}"
         cat "${{ env.SUMMARY_MD }}" >> $GITHUB_STEP_SUMMARY
@@ -59,5 +61,6 @@ runs:
 
     - name: Return gating result exit code
       if: always()
+      shell: bash
       run: |
         exit "${{ steps.snyk-filter-gating.outputs.exit-code }}"
