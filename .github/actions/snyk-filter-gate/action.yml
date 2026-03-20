@@ -19,7 +19,6 @@ runs:
       uses: actions/setup-node@v6
       with:
         node-version: '24'
-        cache: 'npm'
 
     - name: Install snyk-filter
       shell: bash
@@ -39,7 +38,7 @@ runs:
         echo "output-json-path=${{ env.OUTPUT_JSON_PATH }}" >> $GITHUB_ENV
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
-        DEBUG: ${{ case(inputs.debug == 'true', '*', '') }}
+        DEBUG: ${{ inputs.debug == 'true' && '*' || '' }}
         OUTPUT_JSON_PATH: ${{ github.action_path }}/snyk-filter-results.json
 
     - name: Upload snyk-filter results
