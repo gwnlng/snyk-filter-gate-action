@@ -54,8 +54,10 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: snyk-filter-transformed-results
+        # Unique per job avoids 409 when several jobs use this action in one workflow run.
+        name: snyk-filter-transformed-results-${{ github.job }}
         path: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.json
+        overwrite: true
 
     - name: Transform snyk-filter results to markdown
       if: always() && steps.upload-gating-results.outcome == 'success'
