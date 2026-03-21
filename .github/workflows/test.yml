@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Snyk Filter Gate (no matching vulns → pass)
-        uses: .github/actions/snyk-filter-gate
+        uses: '${{ github.action_path }}/.github/actions/snyk-filter-gate'
         with:
           snyk-json-path: tests/fixtures/snyk-sample-no-matching-vulns.json
 
