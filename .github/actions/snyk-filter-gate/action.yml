@@ -42,9 +42,12 @@ runs:
         export NODE_JQ_SKIP_INSTALL_BINARY=true
         export JQ_PATH="$(which jq)"
         OUT_JSON="$GITHUB_ACTION_PATH/snyk-filter-results.json"
+        # Bash runs with errexit; a non-zero exit from filter.sh would abort the script before EXIT=$? and GITHUB_OUTPUT.
+        set +e
         "$GITHUB_ACTION_PATH/filter.sh" "${{ inputs.snyk-json-path }}" "$OUT_JSON"
         EXIT=$?
-        echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
+        set -e
+        echo "exit-code=$EXIT" >> "$GITHUB_OUTPUT"
       env:
         GITHUB_ACTION_PATH: ${{ steps.action_paths.outputs.dir }}
         DEBUG: ${{ inputs.debug == 'true' && '*' || '' }}
