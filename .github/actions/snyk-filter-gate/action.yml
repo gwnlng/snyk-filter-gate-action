@@ -39,8 +39,6 @@ runs:
       continue-on-error: true
       run: |
         chmod +x "$GITHUB_ACTION_PATH/filter.sh"
-        export NODE_JQ_SKIP_INSTALL_BINARY=true
-        export JQ_PATH="$(which jq)"
         OUT_JSON="$GITHUB_ACTION_PATH/snyk-filter-results.json"
         # Bash runs with errexit; a non-zero exit from filter.sh would abort the script before EXIT=$? and GITHUB_OUTPUT.
         set +e
