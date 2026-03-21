@@ -31,10 +31,9 @@ set -e
 
 # Remove snyk-filter message lines (e.g. "project - No issues found after custom filtering") that break JSON.
 # If we have concatenated JSON objects (}\n{), merge to },{ then wrap in [...] so jq can parse.
-if [ -f "$OUTPUT_JSON_PATH" ] && [ -s "$OUTPUT_JSON_PATH" ]; then
-  tmp="${OUTPUT_JSON_PATH}.tmp"
+if [ -f "$JSON_OUTPUT" ] && [ -s "$JSON_OUTPUT" ]; then
+  grep -v 'No issues found after custom filtering[[:space:]]*$' "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
   awk '
-    /No issues found after custom filtering[[:space:]]*$/ { next }
     /^}[[:space:]]*$/ {
       if (getline n > 0) {
         if (n ~ /^[[:space:]]*\{/) { printf "},"; print n; next }
@@ -42,9 +41,9 @@ if [ -f "$OUTPUT_JSON_PATH" ] && [ -s "$OUTPUT_JSON_PATH" ]; then
       }
     }
     { print }
-  ' "$OUTPUT_JSON_PATH" > "$tmp" && mv "$tmp" "$OUTPUT_JSON_PATH"
-  if grep -q '^},{[[:space:]]*$' "$OUTPUT_JSON_PATH" 2>/dev/null; then
-    { echo '['; cat "$OUTPUT_JSON_PATH"; echo ']'; } > "$tmp" && mv "$tmp" "$OUTPUT_JSON_PATH"
+  ' "$JSON_OUTPUT" > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
+  if grep -q '^},{[[:space:]]*$' "$JSON_OUTPUT" 2>/dev/null; then
+    (echo '['; cat "$JSON_OUTPUT"; echo ']') > "${JSON_OUTPUT}.tmp" && mv "${JSON_OUTPUT}.tmp" "$JSON_OUTPUT"
   fi
 fi
 
