@@ -15,6 +15,15 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # github.action_path can contain './' when the workflow uses uses: ./.github/... ;
+    # upload-artifact rejects paths with '.' or '..' segments, so we canonicalize first.
+    - name: Resolve action directory
+      id: action_paths
+      shell: bash
+      run: |
+        cd -P "${{ github.action_path }}"
+        echo "dir=$(pwd -P)" >> "$GITHUB_OUTPUT"
+
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -32,12 +41,12 @@ runs:
         chmod +x "$GITHUB_ACTION_PATH/filter.sh"
         export NODE_JQ_SKIP_INSTALL_BINARY=true
         export JQ_PATH="$(which jq)"
-        OUT_JSON="${{ github.action_path }}/snyk-filter-results.json"
+        OUT_JSON="$GITHUB_ACTION_PATH/snyk-filter-results.json"
         "$GITHUB_ACTION_PATH/filter.sh" "${{ inputs.snyk-json-path }}" "$OUT_JSON"
         EXIT=$?
         echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
       env:
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        GITHUB_ACTION_PATH: ${{ steps.action_paths.outputs.dir }}
         DEBUG: ${{ inputs.debug == 'true' && '*' || '' }}
 
     - name: Upload snyk-filter results
@@ -46,16 +55,17 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: snyk-filter-transformed-results
-        path: ${{ github.action_path }}/snyk-filter-results.json
+        path: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.json
 
     - name: Transform snyk-filter results to markdown
       if: always() && steps.upload-gating-results.outcome == 'success'
       shell: bash
       run: |
-        jq -rf "${{ github.action_path }}/vulnerabilities-table.jq" "${{ github.action_path }}/snyk-filter-results.json" > "${{ env.SUMMARY_MD }}"
-        cat "${{ env.SUMMARY_MD }}" >> $GITHUB_STEP_SUMMARY
+        jq -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_MD"
+        cat "$SUMMARY_MD" >> "$GITHUB_STEP_SUMMARY"
       env:
-        SUMMARY_MD: ${{ github.action_path }}/snyk-filter-results.md
+        ACTION_DIR: ${{ steps.action_paths.outputs.dir }}
+        SUMMARY_MD: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.md
 
     - name: Return gating result exit code
       if: always()
