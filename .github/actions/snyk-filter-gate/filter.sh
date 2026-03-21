@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Args: snyk_json_path (required)
+# Args: snyk_json_path (required), output_json_path (optional, default: snyk-filter-results.json in cwd)
 # Uses default filter at $GITHUB_ACTION_PATH/.snyk-filter/snyk.yml
-# Writes snyk-filter stdout to snyk-filter-results.json, generates snyk-filter-results.md via jq, appends to GITHUB_STEP_SUMMARY.
+# Writes snyk-filter JSON to output_json_path.
 SNYK_JSON_PATH="${1:-}"
-OUTPUT_JSON_PATH="${2:-}"
+OUTPUT_JSON_PATH="${2:-snyk-filter-results.json}"
 FILTER_FILE="${GITHUB_ACTION_PATH:?}/.snyk-filter/snyk.yml"
-JQ_TEMPLATE="${GITHUB_ACTION_PATH:?}/vulnerabilities-table.jq"
 
 if [ -z "$SNYK_JSON_PATH" ]; then
   echo "Error: snyk-json-path is required. Provide the path to your Snyk test JSON file (e.g. snyk test --json > snyk-results.json)." >&2

@@ -32,14 +32,13 @@ runs:
         chmod +x "$GITHUB_ACTION_PATH/filter.sh"
         export NODE_JQ_SKIP_INSTALL_BINARY=true
         export JQ_PATH="$(which jq)"
-        "$GITHUB_ACTION_PATH/filter.sh" "${{ inputs.snyk-json-path }}" > "${{ env.OUTPUT_JSON_PATH }}"
+        OUT_JSON="${{ github.action_path }}/snyk-filter-results.json"
+        "$GITHUB_ACTION_PATH/filter.sh" "${{ inputs.snyk-json-path }}" "$OUT_JSON"
         EXIT=$?
         echo "exit-code=$EXIT" >> $GITHUB_OUTPUT
-        echo "output-json-path=${{ env.OUTPUT_JSON_PATH }}" >> $GITHUB_ENV
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
         DEBUG: ${{ inputs.debug == 'true' && '*' || '' }}
-        OUTPUT_JSON_PATH: ${{ github.action_path }}/snyk-filter-results.json
 
     - name: Upload snyk-filter results
       id: upload-gating-results
@@ -47,13 +46,13 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: snyk-filter-transformed-results
-        path: ${{ env.OUTPUT_JSON_PATH }}
+        path: ${{ github.action_path }}/snyk-filter-results.json
 
     - name: Transform snyk-filter results to markdown
       if: always() && steps.upload-gating-results.outcome == 'success'
       shell: bash
       run: |
-        jq -rf "${{ github.action_path }}/vulnerabilities-table.jq" "$output-json-path" > "${{ env.SUMMARY_MD }}"
+        jq -rf "${{ github.action_path }}/vulnerabilities-table.jq" "${{ github.action_path }}/snyk-filter-results.json" > "${{ env.SUMMARY_MD }}"
         cat "${{ env.SUMMARY_MD }}" >> $GITHUB_STEP_SUMMARY
       env:
         SUMMARY_MD: ${{ github.action_path }}/snyk-filter-results.md
