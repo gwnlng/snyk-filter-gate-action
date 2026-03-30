@@ -51,7 +51,7 @@ runs:
         DEBUG: ${{ inputs.debug == 'true' && '*' || '' }}
 
     - name: Upload snyk-filter results
-      id: upload-gating-results
+      id: upload-gating-results-json
       if: always()
       uses: actions/upload-artifact@v4
       with:
@@ -60,15 +60,27 @@ runs:
         path: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.json
         overwrite: true
 
-    - name: Transform snyk-filter results to markdown
-      if: always() && steps.upload-gating-results.outcome == 'success'
+    - name: Transform snyk-filter results to markdown and CSV
+      if: always() && steps.upload-gating-results-json.outcome == 'success'
       shell: bash
       run: |
-        jq -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_MD"
+        jq --arg format "markdown" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_MD"
+        jq --arg format "csv" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_CSV"
         cat "$SUMMARY_MD" >> "$GITHUB_STEP_SUMMARY"
       env:
         ACTION_DIR: ${{ steps.action_paths.outputs.dir }}
         SUMMARY_MD: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.md
+        SUMMARY_CSV: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.csv
+
+    - name: Upload snyk-filter CSV results
+      id: upload-gating-results-csv
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        # Unique per job avoids 409 when several jobs use this action in one workflow run.
+        name: snyk-filter-csv-results-${{ github.job }}
+        path: ${{ steps.action_paths.outputs.dir }}/snyk-filter-results.csv
+        overwrite: true
 
     - name: Return gating result exit code
       if: always()
