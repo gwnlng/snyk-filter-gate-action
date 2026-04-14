@@ -29,22 +29,4 @@ snyk-filter -i "$SNYK_JSON_PATH" -f "$FILTER_FILE" --json > "$OUTPUT_JSON_PATH"
 FILTER_EXIT=$?
 set -e
 
-# Remove snyk-filter message lines (e.g. "project - No issues found after custom filtering") that break JSON.
-# If we have concatenated JSON objects (}\n{), merge to },{ then wrap in [...] so jq can parse.
-if [ -f "$OUTPUT_JSON_PATH" ] && [ -s "$OUTPUT_JSON_PATH" ]; then
-  grep -v 'No issues found after custom filtering[[:space:]]*$' "$OUTPUT_JSON_PATH" > "${OUTPUT_JSON_PATH}.tmp" && mv "${OUTPUT_JSON_PATH}.tmp" "$OUTPUT_JSON_PATH"
-  awk '
-    /^}[[:space:]]*$/ {
-      if (getline n > 0) {
-        if (n ~ /^[[:space:]]*\{/) { printf "},"; print n; next }
-        else { print; print n; next }
-      }
-    }
-    { print }
-  ' "$OUTPUT_JSON_PATH" > "${OUTPUT_JSON_PATH}.tmp" && mv "${OUTPUT_JSON_PATH}.tmp" "$OUTPUT_JSON_PATH"
-  if grep -q '^},{[[:space:]]*$' "$OUTPUT_JSON_PATH" 2>/dev/null; then
-    (echo '['; cat "$OUTPUT_JSON_PATH"; echo ']') > "${OUTPUT_JSON_PATH}.tmp" && mv "${OUTPUT_JSON_PATH}.tmp" "$OUTPUT_JSON_PATH"
-  fi
-fi
-
 exit $FILTER_EXIT
