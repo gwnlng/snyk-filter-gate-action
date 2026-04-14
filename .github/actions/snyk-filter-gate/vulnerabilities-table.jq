@@ -69,7 +69,7 @@ def content_csv:
       + (vulnrows_array | map(csv_row))
     ) | join("\n")
   else
-    "No filtered vulnerabilities matching criteria found."
+    empty
   end;
 
 ($format | ascii_downcase) as $fmt
