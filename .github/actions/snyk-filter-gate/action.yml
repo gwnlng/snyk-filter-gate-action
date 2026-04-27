@@ -64,6 +64,7 @@ runs:
       if: always() && steps.upload-gating-results-json.outcome == 'success'
       shell: bash
       run: |
+        jq -rf "$ACTION_DIR/severity-summary-table.jq" "$ACTION_DIR/snyk-filter-results.json" >> "$GITHUB_STEP_SUMMARY"
         jq --arg format "markdown" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_MD"
         jq --arg format "csv" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_CSV"
         cat "$SUMMARY_MD" >> "$GITHUB_STEP_SUMMARY"
