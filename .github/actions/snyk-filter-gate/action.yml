@@ -67,6 +67,7 @@ runs:
         jq -rf "$ACTION_DIR/severity-summary-table.jq" "$ACTION_DIR/snyk-filter-results.json" >> "$GITHUB_STEP_SUMMARY"
         jq --arg format "markdown" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_MD"
         jq --arg format "csv" -rf "$ACTION_DIR/vulnerabilities-table.jq" "$ACTION_DIR/snyk-filter-results.json" > "$SUMMARY_CSV"
+        echo "### Security Vulnerability Issues" >> "$GITHUB_STEP_SUMMARY"
         cat "$SUMMARY_MD" >> "$GITHUB_STEP_SUMMARY"
       env:
         ACTION_DIR: ${{ steps.action_paths.outputs.dir }}
